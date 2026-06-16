@@ -187,13 +187,13 @@ export default {
       return new Response(null, { status: 204, headers: corsHeaders() });
     }
     
-    // POST /report
-    if (url.pathname === '/report' && request.method === 'POST') {
+    // POST /report or POST / — handle report
+    if ((url.pathname === '/' || url.pathname === '/report') && request.method === 'POST') {
       return handleReport(request, env, ctx);
     }
     
-    // Health check
-    if (url.pathname === '/' || url.pathname === '/health') {
+    // GET /report or GET / — health check
+    if (url.pathname === '/' || url.pathname === '/report') {
       return json({ status: 'ok', service: 'fantrove-community', version: '1.0.0' });
     }
     
