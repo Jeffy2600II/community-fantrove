@@ -6,7 +6,7 @@
  * Endpoint: POST /report
  *
  * Environment variables (set via wrangler secret):
- *   DISCORD_WEBHOOK_URL  — Discord webhook URL
+ * DISCORD_WEBHOOK_URL  — Discord webhook URL
  */
 
 // ── CORS ────────────────────────────────────────────────
@@ -68,7 +68,7 @@ const CATEGORY_EMOJI = {
   '\u{1F310} \u0E1B\u0E31\u0E0D\u0E2B\u0E32\u0E01\u0E32\u0E23\u0E41\u0E1B\u0E25': '\u{1F310}',
   '\u{1F517} \u0E25\u0E34\u0E07\u0E01\u0E4C\u0E40\u0E2A\u0E35\u0E22': '\u{1F517}',
   '\u{1F4F1} \u0E1B\u0E31\u0E0D\u0E2B\u0E32 UI \u0E1A\u0E19\u0E21\u0E37\u0E2D\u0E16\u0E37\u0E2D': '\u{1F4F1}',
-  '\u{26A1} \u0E1B\u0E31\u0E0D\u0E2B\u0E32\u0E1B\u0E23\u0E30\u0E2A\u0E34\u0E17\u0E18\u0E34\u0E20\u0E32\u0E1E': '\u{26A1}',
+  '\u{26A1} \u0E1B\u0E31\u0E0D\u0E2B\u0E32\u0E1A\u0E23\u0E30\u0E2A\u0E34\u0E17\u0E18\u0E34\u0E20\u0E32\u0E1E': '\u{26A1}',
   '\u{1F4C4} \u0E02\u0E49\u0E2D\u0E21\u0E39\u0E25\u0E44\u0E21\u0E48\u0E16\u0E39\u0E01\u0E15\u0E49\u0E2D\u0E07': '\u{1F4C4}',
   '\u{1F4A1} \u0E02\u0E49\u0E2D\u0E40\u0E2A\u0E19\u0E2D\u0E41\u0E19\u0E30': '\u{1F4A1}',
   '\u{2753} \u0E2D\u0E37\u0E48\u0E19\u0E46': '\u{2753}',
@@ -182,21 +182,17 @@ export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
     
-    // CORS preflight
+    // CORS preflight (อนุญาตให้อุปกรณ์ภายนอกคุยกับ API ได้ก่อนส่งจริง)
     if (request.method === 'OPTIONS') {
       return new Response(null, { status: 204, headers: corsHeaders() });
     }
     
-    // POST /report or POST / — handle report
-    if ((url.pathname === '/' || url.pathname === '/report') && request.method === 'POST') {
+    // บังคับให้รับเฉพาะ POST และต้องเป็นเส้นทาง /report เท่านั้น
+    if (url.pathname === '/report' && request.method === 'POST') {
       return handleReport(request, env, ctx);
     }
     
-    // GET /report or GET / — health check
-    if (url.pathname === '/' || url.pathname === '/report') {
-      return json({ status: 'ok', service: 'fantrove-community', version: '1.0.0' });
-    }
-    
+    // นอกเหนือจากเงื่อนไขด้านบน ทั้งหมดจะกลายเป็น 404 ไม่พบหน้านี้และไม่ทำงานใดๆ ทันที
     return json({ error: 'Not Found' }, 404);
   },
 };
